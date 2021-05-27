@@ -1,6 +1,6 @@
 from pyduino import * # allows easy serial communication with arduino
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
@@ -10,24 +10,24 @@ def on_connect(client, userdata, flags, rc):
 
     # subscribe to the topics relevant for this client
     client.subscribe(motion_state_topic)
-
+    
 # when a publish message is received from the broker
 def on_message(client, userdata, msg):
     print("Msg Received: " + str(msg.payload))
     # if there has been motion
     if str(msg.topic) == motion_state_topic and msg.payload != '0':
         # 'engage' this edge server for the next five minutes
-        time_for_disengagement = datetime.now() + datetime.timedelta(minutes=5)
+        time_for_disengagement = datetime.now() + (timedelta(minutes=5))
 
 # the ip address of the cloud server
 broker_ip = "54.234.179.237"
+time_for_disengagement:datetime = datetime.now()
 
 # the mqtt topics that this edge server is concerned with
 motion_state_topic = "smart_home/motion_state"
 brightness_topic = "smart_home/brightness"
 
 # the "timestamp" generated for when the system will disengage (will be 5 minutes after last motion detection)
-time_for_disengagement = datetime.now()
 
 # uses default serial port, baud and timeout settings for Arduino class
 arduino_connection = Arduino()
@@ -36,7 +36,7 @@ arduino_connection = Arduino()
 time.sleep(3)
 
 # initialise soft potentiometer sensor as input
-SOFTPOT_PIN = 0
+SOFTPOT_PIN = 2
 arduino_connection.set_pin_mode(SOFTPOT_PIN,'I')
 
 # allow time to make connection
