@@ -23,8 +23,8 @@ def on_message(client, userdata, msg):
     # if there has been motion
     # if str(msg.topic).decode('UTF-8') == motion_state_topic and str(msg.payload) != '0':
     with open('cloud_server/home_data.json') as f:
-        smart_home_data = json.load(f)
-        motion_state = smart_home_data['motion_state']
+            smart_home_data = json.load(f)
+            motion_state = smart_home_data['motion_state']
     # 'engage' this edge server for the next five minutes
 
 
@@ -73,7 +73,7 @@ try:
         # while this edge server is engaged
         with open('cloud_server/home_data.json') as f:
             smart_home_data = json.load(f)
-        motion_state = smart_home_data['motion_state']
+            motion_state = smart_home_data['motion_state']
         # while this edge server is engaged
         while motion_state == 1:
             # read softpot value from Arduino
@@ -82,7 +82,7 @@ try:
             print(potentiometer_value)
             # convert softpot scale from 0 - 1023 to 0 - 255 and set the LED accordingly
             brightness = (255 / 1023) * float(potentiometer_value)
-            brightness = int(brightness)
+            brightness = int(float(brightness))
             publish.single(topic=brightness_topic,
                            payload=brightness, hostname=broker_ip)
         time.sleep(1)
