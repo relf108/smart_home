@@ -16,11 +16,11 @@ def on_message(client, userdata, msg):
     decoded_message = str(msg.payload)
     if str(msg.topic) == temperature_topic:
         # if temperature is above 30 degrees
-        if int(decoded_message) > 25:
+        if int(float(decoded_message)) > 25:
             # sound the alarm
             arduino_connection.digital_play(BUZZER_PIN, 1000)
     if str(msg.topic) == brightness_topic:
-        arduino_connection.analog_write(LED_PIN, int(decoded_message))
+        arduino_connection.analog_write(LED_PIN, int(float(decoded_message)))
 
 # the ip address of the cloud server
 broker_ip = "54.234.179.237"
