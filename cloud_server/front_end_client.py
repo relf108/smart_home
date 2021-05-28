@@ -39,7 +39,7 @@ def on_message(client, userdata, msg):
 def extractPayload(payload):
     payload = str(payload)
     res = payload.split("'")
-    return int(res[1])
+    return int(float(res[1]))
 
 
 thingsboard_host = 'localhost:8080'
