@@ -83,6 +83,9 @@ try:
             temperature = voltage * 100
             publish.single(topic=temperature_topic,
                            payload=temperature, hostname=broker_ip)
+            with open('cloud_server/home_data.json') as f:
+                smart_home_data = json.load(f)
+        motion_state = smart_home_data['motion_state']
         time.sleep(1)
 
 except KeyboardInterrupt:
