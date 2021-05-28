@@ -72,7 +72,7 @@ try:
             smart_home_data = json.load(f)
         motion_state = smart_home_data['motion_state']
         # while this edge server is engaged
-        while motion_state:
+        while motion_state == 1:
             # read temperature from Arduino
             read_value = arduino_connection.analog_read(TEMPERATURE_PIN)
             print(read_value)
