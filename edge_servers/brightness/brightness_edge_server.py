@@ -1,33 +1,54 @@
-from pyduino import * # allows easy serial communication with arduino
+from pyduino import *  # allows easy serial communication with arduino
 import time
 from datetime import datetime, timedelta
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
+import json
 
 # when the client connects to the cloud server
+
+
 def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT broker")
 
     # subscribe to the topics relevant for this client
     client.subscribe(motion_state_topic)
-    
+
+
 # when a publish message is received from the broker
+
+
 def on_message(client, userdata, msg):
     print("Message received from " + str(msg.topic) + ": " + str(msg.payload))
     # if there has been motion
-    if str(msg.topic).decode('UTF-8') == motion_state_topic and str(msg.payload) != '0':
-        # 'engage' this edge server for the next five minutes
-        time_for_disengagement = datetime.datetime.now() + datetime.timedelta(minutes = 5)
+    # if str(msg.topic).decode('UTF-8') == motion_state_topic and str(msg.payload) != '0':
+    smart_home_data['motion_state'] = extractPayload(msg.payload)
+    with open("cloud_server/home_data.json", "w") as outfile:
+        json.dump(smart_home_data, outfile)
+    # 'engage' this edge server for the next five minutes
+
 
 # the ip address of the cloud server
 broker_ip = "54.234.179.237"
+
+with open('cloud_server/home_data.json') as f:
+    smart_home_data = json.load(f)
+    motion_state = smart_home_data['motion_state']
+
+
+def extractPayload(payload):
+    payload = str(payload)
+    res = payload.split("'")
+    return int(res[1])
+
 
 # the mqtt topics that this edge server is concerned with
 motion_state_topic = "smart_home/motion_state"
 brightness_topic = "smart_home/brightness"
 
 # the "timestamp" generated for when the system will disengage (will be 5 minutes after last motion detection)
-time_for_disengagement = datetime.datetime.now()
+#time_for_disengagement = datetime.datetime.now()
+
 
 # uses default serial port, baud and timeout settings for Arduino class
 arduino_connection = Arduino()
@@ -37,7 +58,7 @@ time.sleep(3)
 
 # initialise potentiometer sensor as input
 POTENTIOMETER_PIN = 0
-arduino_connection.set_pin_mode(POTENTIOMETER_PIN,'I')
+arduino_connection.set_pin_mode(POTENTIOMETER_PIN, 'I')
 
 # allow time to make connection
 time.sleep(1)
@@ -52,16 +73,22 @@ client.connect(broker_ip, 1883, 60)
 client.loop_start()
 
 # endless loop in this thread
+
 try:
     while True:
         # while this edge server is engaged
-        while datetime.datetime.now() < time_for_disengagement:
+        while motion_state:
             # read softpot value from Arduino
-            potentiometer_value = arduino_connection.analog_read(POTENTIOMETER_PIN)
+            potentiometer_value = arduino_connection.analog_read(
+                POTENTIOMETER_PIN)
             print(potentiometer_value)
             # convert softpot scale from 0 - 1023 to 0 - 255 and set the LED accordingly
             brightness = (255 / 1023) * float(potentiometer_value)
-            publish.single(topic = brightness_topic, payload = brightness, hostname=broker_ip)
+            publish.single(topic=brightness_topic,
+                           payload=brightness, hostname=broker_ip)
+            with open('cloud_server/home_data.json') as f:
+                smart_home_data = json.load(f)
+        motion_state = smart_home_data['motion_state']
         time.sleep(1)
 except KeyboardInterrupt:
     client.loop_stop()

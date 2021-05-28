@@ -39,8 +39,6 @@ def on_message(client, userdata, msg):
 def extractPayload(payload):
     payload = str(payload)
     res = payload.split("'")
-
-    print()
     return int(res[1])
 
 
