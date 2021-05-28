@@ -77,7 +77,7 @@ try:
             read_value = arduino_connection.analog_read(TEMPERATURE_PIN)
             print(read_value)
             # convert to voltage
-            voltage = float(read_value * 5.0)
+            voltage = read_value * 5.0
             voltage /= 1024.0
             # convert to celsius
             temperature = int(float(voltage * 100))
