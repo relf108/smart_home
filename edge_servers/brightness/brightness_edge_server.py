@@ -85,9 +85,6 @@ try:
             brightness = int(brightness)
             publish.single(topic=brightness_topic,
                            payload=brightness, hostname=broker_ip)
-            with open('cloud_server/home_data.json') as f:
-                smart_home_data = json.load(f)
-        motion_state = smart_home_data['motion_state']
         time.sleep(1)
 except KeyboardInterrupt:
     client.loop_stop()
