@@ -18,7 +18,8 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    print("Msg Received: " + str(msg.payload))
+    print("Message received from " + str(msg.topic) + ": " + str(msg.payload))
+
     if str(msg.topic) == motion_state_topic:
         smart_home_data['motion_state'] = extractPayload(msg.payload)
         with open("cloud_server/home_data.json", "w") as outfile:

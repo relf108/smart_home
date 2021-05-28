@@ -4,21 +4,23 @@ import paho.mqtt.client as mqtt
 
 # when the client connects to the cloud server
 def on_connect(client, userdata, flags, rc):
-    print("Connected")
+    print("Connected to MQTT broker")
 
     # subscribe to the topics relevant for this client
     client.subscribe([(temperature_topic, 0), (brightness_topic, 0)])
 
 # when a publish message is received from the broker
 def on_message(client, userdata, msg):
-    print("Msg Received: " + str(msg.payload))
-    if str(msg.topic) == temperature_topic:
+    print("Message received from " + str(msg.topic) + ": " + str(msg.payload))
+    # decode the message
+    decoded_message = str(msg.payload).decode('UTF-8')
+    if str(msg.topic).decode('UTF-8') == temperature_topic:
         # if temperature is above 30 degrees
-        if int(msg.payload) > 25:
+        if int(decoded_message) > 25:
             # sound the alarm
-            arduino_connection.digital_play(BUZZER_PIN, 500)
+            arduino_connection.digital_play(BUZZER_PIN, 1000)
     if str(msg.topic) == brightness_topic:
-        arduino_connection.analog_write(LED_PIN, msg.payload)
+        arduino_connection.analog_write(LED_PIN, int(decoded_message))
 
 # the ip address of the cloud server
 broker_ip = "54.234.179.237"

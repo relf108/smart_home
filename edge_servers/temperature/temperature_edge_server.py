@@ -6,18 +6,18 @@ import paho.mqtt.publish as publish
 
 # when the client connects to the cloud server
 def on_connect(client, userdata, flags, rc):
-    print("Connected")
+    print("Connected to MQTT broker")
 
     # subscribe to the topics relevant for this client
     client.subscribe(motion_state_topic)
 
 # when a publish message is received from the broker
 def on_message(client, userdata, msg):
-    print("Msg Received: " + str(msg.payload))
+    print("Message received from " + str(msg.topic) + ": " + str(msg.payload))
     # if there has been motion
-    if str(msg.topic) == motion_state_topic and msg.payload != '0':
+    if str(msg.topic).decode('UTF-8') == motion_state_topic and str(msg.payload) != '0':
         # 'engage' this edge server for the next five minutes
-        time_for_disengagement = datetime.now() + datetime.timedelta(minutes=5)
+        time_for_disengagement = datetime.datetime.now() + datetime.timedelta(minutes = 5)
 
 # the ip address of the cloud server
 broker_ip = "54.234.179.237"
@@ -27,7 +27,7 @@ motion_state_topic = "smart_home/motion_state"
 temperature_topic = "smart_home/temperature"
 
 # the "timestamp" generated for when the system will disengage (will be 5 minutes after last motion detection)
-time_for_disengagement = datetime.now()
+time_for_disengagement = datetime.datetime.now()
 
 # uses default serial port, baud and timeout settings for Arduino class
 arduino_connection = Arduino()
@@ -58,12 +58,13 @@ try:
     	while datetime.now() < time_for_disengagement:
             # read temperature from Arduino
             read_value = arduino_connection.analog_read(TEMPERATURE_PIN)
+            print(read_value)
             # convert to voltage
             voltage = read_value * 5.0
             voltage /= 1024.0
-            # convert to celsius with 500 mV offset
-            temperature = (voltage - 0.5) * 100
-            publish.single(temperature_topic, temperature, hostname=broker_ip)
+            # convert to celsius
+            temperature = voltage * 100
+            publish.single(topic=temperature_topic, payload=temperature, hostname=broker_ip)
             time.sleep(1)
 except KeyboardInterrupt:
     client.loop_stop()
