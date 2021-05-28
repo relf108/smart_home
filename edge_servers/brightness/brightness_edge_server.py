@@ -36,12 +36,6 @@ with open('cloud_server/home_data.json') as f:
     motion_state = smart_home_data['motion_state']
 
 
-def extractPayload(payload):
-    payload = str(payload)
-    res = payload.split("'")
-    return int(res[1])
-
-
 # the mqtt topics that this edge server is concerned with
 motion_state_topic = "smart_home/motion_state"
 brightness_topic = "smart_home/brightness"
