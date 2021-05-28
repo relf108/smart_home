@@ -13,8 +13,8 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print("Message received from " + str(msg.topic) + ": " + str(msg.payload))
     # decode the message
-    decoded_message = str(msg.payload).decode('UTF-8')
-    if str(msg.topic).decode('UTF-8') == temperature_topic:
+    decoded_message = str(msg.payload)
+    if str(msg.topic) == temperature_topic:
         # if temperature is above 30 degrees
         if int(decoded_message) > 25:
             # sound the alarm
