@@ -26,7 +26,7 @@ def on_message(client, userdata, msg):
             json.dump(smart_home_data, outfile)
 
     if str(msg.topic) == temperature_topic:
-        smart_home_data['temperature'] = extractPayload(msg.payload)
+        smart_home_data['temperature'] = extractPayloadTemp(msg.payload)
         with open("cloud_server/home_data.json", "w") as outfile:
             json.dump(smart_home_data, outfile)
 
@@ -41,6 +41,10 @@ def extractPayload(payload):
     res = payload.split("'")
     return int(res[1])
 
+def extractPayloadTemp(payload):
+    payload = str(payload)
+    res = payload.split("'")
+    return int(float(res[1]))
 
 thingsboard_host = 'localhost:8080'
 access_token = '12345'
