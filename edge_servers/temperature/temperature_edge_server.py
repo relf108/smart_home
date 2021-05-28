@@ -80,7 +80,7 @@ try:
             voltage = read_value * 5.0
             voltage /= 1024.0
             # convert to celsius
-            temperature = int(voltage) * 100
+            temperature = float(voltage * 100)
             publish.single(topic=temperature_topic,
                            payload=temperature, hostname=broker_ip)
             with open('cloud_server/home_data.json') as f:
