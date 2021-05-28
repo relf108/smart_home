@@ -41,7 +41,7 @@ motion_state_topic = "smart_home/motion_state"
 temperature_topic = "smart_home/temperature"
 
 # the "timestamp" generated for when the system will disengage (will be 5 minutes after last motion detection)
-#time_for_disengagement = datetime.datetime.now()
+# time_for_disengagement = datetime.datetime.now()
 
 # uses default serial port, baud and timeout settings for Arduino class
 arduino_connection = Arduino()
@@ -68,6 +68,9 @@ client.loop_start()
 # endless loop in this thread
 try:
     while True:
+        with open('cloud_server/home_data.json') as f:
+            smart_home_data = json.load(f)
+        motion_state = smart_home_data['motion_state']
         # while this edge server is engaged
         while motion_state:
             # read temperature from Arduino
@@ -80,9 +83,6 @@ try:
             temperature = voltage * 100
             publish.single(topic=temperature_topic,
                            payload=temperature, hostname=broker_ip)
-            with open('cloud_server/home_data.json') as f:
-                smart_home_data = json.load(f)
-        motion_state = smart_home_data['motion_state']
         time.sleep(1)
 
 except KeyboardInterrupt:
