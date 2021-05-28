@@ -73,20 +73,19 @@ try:
         motion_state = smart_home_data['motion_state']
         # while this edge server is engaged
         while motion_state == 1:
+            # read temperature from Arduino
+            read_value = arduino_connection.analog_read(TEMPERATURE_PIN)
+            print(read_value)
+            # convert to voltage
+            voltage = read_value * 5.0
+            voltage /= 1024.0
+            # convert to celsius
+            temperature = voltage * 100
+            publish.single(topic=temperature_topic,
+                           payload=temperature, hostname=broker_ip)
             with open('cloud_server/home_data.json') as f:
                 smart_home_data = json.load(f)
-            motion_state = smart_home_data['motion_state']
-        # read temperature from Arduino
-        read_value = arduino_connection.analog_read(TEMPERATURE_PIN)
-        print(read_value)
-        # convert to voltage
-        voltage = read_value * 5.0
-        voltage /= 1024.0
-        # convert to celsius
-        temperature = voltage * 100
-        publish.single(topic=temperature_topic,
-                       payload=temperature, hostname=broker_ip)
-
+        motion_state = smart_home_data['motion_state']
         time.sleep(1)
 
 except KeyboardInterrupt:

@@ -71,7 +71,11 @@ client.loop_start()
 try:
     while True:
         # while this edge server is engaged
-        while motion_state:
+        with open('cloud_server/home_data.json') as f:
+            smart_home_data = json.load(f)
+        motion_state = smart_home_data['motion_state']
+        # while this edge server is engaged
+        while motion_state == 1:
             # read softpot value from Arduino
             potentiometer_value = arduino_connection.analog_read(
                 POTENTIOMETER_PIN)
