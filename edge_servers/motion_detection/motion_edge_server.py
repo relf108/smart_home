@@ -5,11 +5,11 @@ import paho.mqtt.publish as publish
 
 # when the client connects to the cloud server
 def on_connect(client, userdata, flags, rc):
-    print("Connected")
+    print("Connected to MQTT broker")
 
 # when a publish message is received from the broker
 def on_message(client, userdata, msg):
-    print("Msg Received: " + str(msg.payload))
+    print("Message received from " + str(msg.topic) + ": " + str(msg.payload))
 
 # the ip address of the cloud server
 broker_ip = "54.234.179.237"
@@ -44,9 +44,10 @@ try:
     while True:
         # read motion state from Arduino
         motion_state = arduino_connection.digital_read(MOTION_PIN)
+        print(motion_state)
         # publish if there is motion
         if motion_state != '0':
-            publish.single(motion_state_topic, motion_state, hostname=broker_ip)
+            publish.single(topic=motion_state_topic, payload=motion_state, hostname=broker_ip)
         time.sleep(1)
 except KeyboardInterrupt:
     client.loop_stop()
