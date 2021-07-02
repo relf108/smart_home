@@ -44,6 +44,7 @@ def extractPayload(payload):
 def extractPayloadTemp(payload):
     payload = str(payload)
     res = payload.split("'")
+    print(res[1])
     return int(float(res[1]))
 
 thingsboard_host = 'localhost:8080'
